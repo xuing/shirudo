@@ -418,14 +418,15 @@ Run under the sanitizers
 
 ``SANITIZE`` instruments the host binaries and the test helpers. The BPF
 objects are unaffected. Recovery is off, so every report fails the run.
-CI runs the same with gcc and with clang.
+CI runs the same with gcc on each pull request, and with gcc and with
+clang on each push to ``main``.
 
 ``SANITIZE=thread`` runs the same tests under ThreadSanitizer, which
 reports data races and, in a signal handler, a call that is not
 async-signal-safe or a changed ``errno``. shirudo starts no thread and
 installs no signal handler, so it reports nothing today; the ``TSan``
-leg of the ``Sanitizers`` workflow runs it with clang so that the first
-one added is checked.
+leg of the ``Sanitizers`` workflow runs it with clang on each push to
+``main`` so that the first one added is checked.
 
 These three CI jobs install dependencies with
 :src:`.github/scripts/sanitizer-deps.sh` inside a disposable LVH guest.
@@ -471,8 +472,9 @@ leaves out the decoder's unit tests and fuzz target: LuaJIT's
 interpreter is assembly, which no sanitizer instruments, so the values
 it hands back would read as uninitialized. ASan and UBSan cover those.
 The ``MSan`` job of the ``Sanitizers`` workflow runs the same, the fuzz
-targets for 60 seconds on each push and pull request and for ten
-minutes in a run started by hand.
+targets for 60 seconds on each push to ``main``, for ten seconds on a
+pull request, in which each still runs its seeds, and for ten minutes in
+a run started by hand.
 
 Run the fuzz targets
 --------------------
@@ -553,8 +555,9 @@ and leaves its input in ``testing/fuzz/crash-afl-<target>-<n>``; the
 libFuzzer build of the target reproduces it like any other input.
 
 The ``afl-fuzz`` job of the ``Sanitizers`` workflow runs every target
-under AFL++ when the ``libFuzzer`` job does, for as long, and saves its
-corpus when that job does. Each starts from the newest corpus either
+under AFL++ on each push to ``main`` and in a run started by hand, for
+as long as the ``libFuzzer`` job, and saves its corpus when that job
+does. A pull request leaves it out. Each starts from the newest corpus either
 kept, so that what one finds the other starts from. What crashed is in
 the job's ``afl-fuzz-crashes`` artifact.
 

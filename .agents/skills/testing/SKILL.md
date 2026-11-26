@@ -20,8 +20,8 @@ make -C testing unit/<suite>                # one unit suite
 make -C testing functional/<family>         # one family, its VM tests too
 make tests VM=0                             # without the target tests
 make tests BACKEND=0                        # without the backend's SQL tests
-make tests VM=0 BACKEND=0 SANITIZE=address,undefined  # CI: once with gcc, once with clang
-make tests VM=0 BACKEND=0 SANITIZE=thread CC=clang    # CI: TSan, for threads and handlers
+make tests VM=0 BACKEND=0 SANITIZE=address,undefined  # CI: gcc on a PR, clang too on main
+make tests VM=0 BACKEND=0 SANITIZE=thread CC=clang    # CI on main: TSan, for threads and handlers
 sh .github/scripts/msan-deps.sh             # MSan: instrumented libraries once,
 sh .github/scripts/msan-tests.sh [60]       # then unit and fuzz from a clean tree
 make -C testing fuzz [FUZZ_SECONDS=60] [FUZZERS=<target>...]

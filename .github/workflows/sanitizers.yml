@@ -25,22 +25,20 @@ jobs:
   # ThreadSanitizer finds data races and, in a signal handler, a call
   # that is not async-signal-safe or a changed errno. shirudo starts no
   # thread and installs no handler today; the leg is there for the first.
+  # A pull request runs the gcc leg alone, which covers the same suite in
+  # less time; the push to main runs the clang ones as well.
   tests:
-    name: ${{ matrix.name }} (${{ matrix.compiler }})
+    name: ${{ matrix.sanitize == 'thread' && 'TSan' || 'ASan+UBSan' }} (${{ matrix.compiler }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - name: ASan+UBSan
-            sanitize: address,undefined
-            compiler: gcc
-          - name: ASan+UBSan
-            sanitize: address,undefined
-            compiler: clang
-          - name: TSan
+        compiler: [gcc, clang]
+        sanitize: ['address,undefined', thread]
+        exclude:
+          - compiler: gcc
             sanitize: thread
-            compiler: clang
+          - compiler: ${{ github.event_name == 'pull_request' && 'clang' || '' }}
     env:
       SHIRUDO_SKIP_TREE_CHECKS: >-
         ${{ (github.event_name == 'pull_request' ||
@@ -128,8 +126,9 @@ jobs:
 
       # The unit tests link the util objects, whose build needs the BTF of
       # a signed-BPF capable bpf-next kernel, as the other jobs do. A push
-      # or a pull request gets a minute per fuzz target, a run by hand
-      # ten.
+      # gets a minute per fuzz target and a run by hand ten. A pull request
+      # gets ten seconds, in which a target still runs every seed under
+      # MSan; the libFuzzer job fuzzes it for the minute.
       - name: Build under MSan and run the unit tests and fuzz targets in LVH VM
         uses: ./.github/actions/lvh
         with:
@@ -173,7 +172,7 @@ jobs:
 
             sh .github/scripts/msan-deps.sh
             sh .github/scripts/msan-tests.sh \
-              ${{ github.event_name == 'workflow_dispatch' && 600 || 60 }}
+              ${{ github.event_name == 'workflow_dispatch' && 600 || github.event_name == 'pull_request' && 10 || 60 }}
 
       - name: Save the MemorySanitizer libraries
         if: always() && steps.msan-deps.outputs.cache-hit != 'true' && hashFiles('build/msan-deps/lib/libcrypto.so') != ''
@@ -262,12 +261,14 @@ jobs:
           if-no-files-found: ignore
 
   # The same targets under AFL++, whose comparison logging and mutators
-  # find inputs libFuzzer does not, for a minute a target on a push or a
-  # pull request and ten by hand. It shares the corpus with the libFuzzer
-  # job through the cache: each starts from what the newest run of
-  # either kept on main.
+  # find inputs libFuzzer does not, for a minute a target on a push and
+  # ten by hand. A pull request leaves it to main: the libFuzzer and MSan
+  # jobs fuzz the same targets there. It shares the corpus with the
+  # libFuzzer job through the cache: each starts from what the newest run
+  # of either kept on main.
   afl-fuzz:
     name: afl-fuzz
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 180
 

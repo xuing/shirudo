@@ -99,6 +99,10 @@ checks: read it against the change. A proof out of step with the code
 is a security bug, as the `security-audit` skill has it; the `proofs`
 skill says how to fix one.
 
+The clang and TSan legs of the `Sanitizers` workflow and its `afl-fuzz`
+job also run only after a push to main, so the clang and TSan runs
+above are the only ones a series gets before it lands.
+
 ## Fixing a commit of the series
 
 Fold a fix into the commit it belongs to rather than adding one on top:
