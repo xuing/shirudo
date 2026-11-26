@@ -107,6 +107,13 @@ signed config image.
      - The prerelease tag, assets, and repository token,
        and rejection of missing source, mismatched source and a bundle
        with the wrong checksum
+   * - ``t0011-main-status``
+     - ``main-status.sh``: the issue a failure on main opens, with its
+       commit, run and failed jobs, the label created once, a later
+       failure added to the open issue once, a pass closing it and a
+       failure that finishes after it changing nothing, cancelled and
+       skipped runs passed over, and the issue of another workflow left
+       alone
 
 ``build`` (1)
 ~~~~~~~~~~~~~

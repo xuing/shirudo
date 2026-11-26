@@ -1,0 +1,61 @@
+name: Main status
+
+# The merge queue, not a person, starts the runs on main, so GitHub tells
+# no one when one fails. Keep an issue open, labelled ci-main, for each
+# workflow failing on main until it passes there again. The list names
+# every workflow that runs on a push to main.
+on:
+  workflow_run:
+    workflows:
+      - Build
+      - Build every commit
+      - Build packages
+      - CI suite
+      - CodeQL
+      - Coverage
+      - Coverity
+      - DCO
+      - Documentation
+      - Lint
+      - Proofs
+      - Sanitizers
+      - Scorecard
+    types: [completed]
+    branches: [main]
+
+permissions: {}
+
+jobs:
+  report:
+    name: ${{ github.event.workflow_run.name }}
+    if: >-
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.conclusion != 'cancelled' &&
+      github.event.workflow_run.conclusion != 'skipped'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: read
+      contents: read
+      issues: write
+    # One run at a time for each workflow, so that two cannot open its
+    # issue twice. GitHub keeps only the newest waiting run, and each run
+    # judges main by the workflow's newest finished run, not by its own.
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.event.workflow_run.workflow_id }}
+      cancel-in-progress: false
+
+    steps:
+      # The scripts of main, never those of the run that finished.
+      - name: Check out the CI scripts
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: .github/scripts
+
+      - name: Open, update or close the workflow's issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WORKFLOW_ID: ${{ github.event.workflow_run.workflow_id }}
+          WORKFLOW_NAME: ${{ github.event.workflow_run.name }}
+        run: .github/scripts/main-status.sh

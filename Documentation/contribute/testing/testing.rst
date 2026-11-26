@@ -97,6 +97,12 @@ Land kernel input changes first. After publishing their bundles, update
 the pin in the same change as any shirudo code that requires the new
 kernel.
 
+The merge queue starts the runs on ``main``, so GitHub tells no one when
+one fails. The ``Main status`` workflow opens an issue labelled
+``ci-main`` instead, ``main: <workflow> fails``, with the commit, the run
+and the jobs that failed. A later failure on ``main`` adds its run to the
+issue, and the workflow's next pass there closes it.
+
 .. raw:: html
 
    <details>
