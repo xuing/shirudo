@@ -54,9 +54,10 @@ Before you begin
 
 The ``CI suite`` workflow runs the x86-64 unit and script checks,
 four functional shards, and the end-to-end tests in parallel jobs.
-The functional shards run upatch, tamperproof, the BPM families, and
-the remaining families. The arm64 host job runs unit, script, and host
-functional tests together.
+The functional shards run the two upatch families, tamperproof, the BPM
+families, and the remaining families, each booting two families' VMs at
+a time. The arm64 host job runs unit, script, and host functional tests
+together.
 
 The merge queue tests a pull request again on top of the changes that
 land before it, and runs only what such a change most often breaks: the
@@ -277,9 +278,11 @@ A shell test is named ``t<F><K><NN>-<what>.sh``:
      - ``functional/signing/``
      - Keys, signatures, vouching, revocation and the trusted set
    * - 3
-     - ``functional/upatch/``
+     - ``functional/upatch/``, ``functional/upatch-many/``
      - The ``.upatch`` container, attach metadata, decoders,
-       serializers, signed policy labels, load, unload and ``upatch get``
+       serializers, signed policy labels, load, unload and ``upatch get``;
+       ``upatch-many`` boots a VM of its own for the eighty upatches
+       ``t3108`` loads, which CI boots beside ``upatch``'s
    * - 4
      - ``functional/tpm/``
      - TPM structures, the measurement register, the eventlog,

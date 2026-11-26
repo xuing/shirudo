@@ -275,7 +275,8 @@ signed config image.
        ``uprobe`` and ``uretprobe`` loads that run once, report their
        checked ``/proc/self/fd/<n>`` target paths and unload
    * - ``t3108-status-many``
-     - ``status --json`` with eighty loaded upatches lists all of them
+     - In ``functional/upatch-many/``, a VM of its own: ``status --json``
+       with eighty loaded upatches lists all of them
    * - ``t3109-policy-labels``
      - A loaded upatch labels executable and ordinary files, ORing
        multiple policy bits with a preexisting xattr; its signed policy

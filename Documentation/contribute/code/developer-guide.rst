@@ -555,7 +555,7 @@ the commit at ``HEAD`` alone without them.
        one part of it: ``unit`` runs the unit and ``ci-checks`` tests,
        ``functional`` and ``end2end`` the tier of that name.
        ``functional-ci-N`` runs one of the four functional shards,
-       where ``N`` is 1 through 4. The ``CI suite`` workflow runs
+       where ``N`` is 1 through 4, two families' VMs at a time. The ``CI suite`` workflow runs
        the unit and script checks, functional shards, and end-to-end
        tests in parallel on x86-64.
        With ``VM=0``, setup uses the kernel CI artifact's BTF and installs

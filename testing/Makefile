@@ -319,12 +319,14 @@ $(addprefix functional/,$(FAMILIES)): functional/%: build-operator
 	$(Q)$(ROOT)/testing/run-tests.sh functional/$*
 	+$(Q)$(call vm-tests,$(filter $*,$(VM_SUITES)))
 
-# Keep the slow upatch and tamperproof VMs on their own runners. The last
-# shard also picks up new families outside BPM.
-functional-ci-1: functional/upatch
+# Keep the slow upatch and tamperproof VMs on their own runners, the
+# upatch VMs two, which tests.sh boots at once. The last shard also picks
+# up new families outside BPM.
+CI_UPATCH_FAMILIES := upatch upatch-many
+functional-ci-1: $(addprefix functional/,$(CI_UPATCH_FAMILIES))
 functional-ci-2: functional/tamperproof
 functional-ci-3: $(addprefix functional/,$(CI_BPM_FAMILIES))
-functional-ci-4: $(addprefix functional/,$(filter-out upatch tamperproof $(CI_BPM_FAMILIES),$(FAMILIES)))
+functional-ci-4: $(addprefix functional/,$(filter-out $(CI_UPATCH_FAMILIES) tamperproof $(CI_BPM_FAMILIES),$(FAMILIES)))
 
 # The end-to-end test boots the operator VM, which builds the operator
 # package and alone gets the signing key on its own disk; while it serves,

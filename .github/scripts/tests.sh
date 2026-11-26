@@ -127,7 +127,9 @@ case "${2:-}" in
 '') goals=tests ;;
 unit) goals='-C testing unit ci-checks' ;;
 functional|end2end) goals="-C testing $2" ;;
-functional-ci-[1-4]) goals="-C testing -k $2" ;;
+# A shard boots two families' VMs at once, of 4 GB each on a runner of
+# 16, and prints each family's output whole, once it is done.
+functional-ci-[1-4]) goals="-C testing -k -j2 -Otarget $2" ;;
 *)
 	echo "usage: $0 setup|run [unit|functional|functional-ci-[1-4]|end2end]" >&2
 	exit 2
