@@ -153,26 +153,26 @@ jobs:
           if-no-files-found: ignore
 
   # A matrix job skipped as a whole reports one check, under none of its
-  # entries' names, and the merge queue waits for each of those. In the
+  # entries' names, and the merge queue waits for the arm64 one. In the
   # queue the job runs instead, without the BTF and with every step
   # skipped.
   arch:
     name: ${{ matrix.arch }}
     needs: btf
     if: ${{ !cancelled() && (needs.btf.result == 'success' || github.event_name == 'merge_group') }}
-    runs-on: ${{ matrix.runner }}
+    runs-on: ${{ matrix.arch == 'arm64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
     timeout-minutes: 90
 
     # Every other job builds and tests on x86-64. arm64 builds natively on
-    # an arm64 runner; riscv64, which has none, under QEMU user emulation.
+    # an arm64 runner; riscv64, which has none, under QEMU user emulation
+    # and, taking the longest, on a push to main alone. An include would
+    # add back the entry the exclude takes out.
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - arch: arm64
-            runner: ubuntu-24.04-arm
-          - arch: riscv64
-            runner: ubuntu-latest
+        arch: [arm64, riscv64]
+        exclude:
+          - arch: ${{ github.event_name != 'push' && 'riscv64' || '' }}
 
     steps:
       - name: Check out repository

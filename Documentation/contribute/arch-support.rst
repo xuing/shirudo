@@ -33,7 +33,7 @@ Comparison
    * - CI
      - Every tier on every push
      - Unit tests, ``ci-checks``, and host functional tests (``VM=0``)
-     - None
+     - Unit tests under QEMU user emulation, after each push to ``main``
    * - Test VM
      - Boots on x86-64 hosts
      - Boots on arm64 hosts; ``t1007`` checks its settings without

@@ -64,9 +64,9 @@ land before it, and runs only what such a change most often breaks: the
 gcc and clang jobs of ``Build`` with their unit tests, ``Build every
 commit``, the documentation, the sign-offs, and the checkpatch, SPDX,
 ShellCheck and unused-function jobs of ``Lint``. The ``CI suite``, the
-arm64, riscv64 and scan-build jobs, sparse, Coccinelle and the packages
-run on the pull request and on every push to ``main``. In the merge queue
-their jobs pass without running.
+arm64 and scan-build jobs, sparse, Coccinelle and the packages run on the
+pull request and on every push to ``main``. In the merge queue their jobs
+pass without running. The riscv64 build runs on pushes to ``main`` alone.
 
 On pull requests and pushes to ``main``, Lint runs the full-tree Coccinelle
 and unused-function checks. The CI suite, coverage, and sanitizer jobs still

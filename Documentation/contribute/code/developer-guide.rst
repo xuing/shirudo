@@ -532,7 +532,8 @@ the commit at ``HEAD`` alone without them.
        from unstable, builds the
        binary and the helper with the BTF given, and runs the unit tests
        and ``check-operator-linkage.sh``. The ``Build`` workflow runs it
-       in a ``debian:testing`` container on arm64 and riscv64. It
+       in a ``debian:testing`` container on arm64, and on riscv64 after
+       each push to ``main``. It
        installs packages as root, so run it only in a throwaway
        container.
    * - ``check-static-target.sh <binary>``
